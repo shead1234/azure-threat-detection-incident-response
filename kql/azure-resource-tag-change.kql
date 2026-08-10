@@ -1,0 +1,14 @@
+AzureActivity
+| where TimeGenerated > ago(1h)
+| where CategoryValue == 'Administrative'
+| where OperationNameValue =~ 'MICROSOFT.RESOURCES/TAGS/WRITE'
+| where ActivityStatusValue =~ 'Success'
+| project
+    TimeGenerated,
+    OperationNameValue,
+    ActivityStatusValue,
+    Caller,
+    ResourceGroup,
+    ResourceId
+| order by TimeGenerated desc
+

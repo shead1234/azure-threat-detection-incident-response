@@ -1,0 +1,11 @@
+
+# Bicep compiled ARM templates
+/analytics-rules/azure-rbac-role-assignment-change-rule.json
+/analytics-rules/azure-resource-tag-change-rule.json
+/automation/medium-severity-alert-added-response-rule.json
+/automation/medium-severity-incident-triage-rule.json
+/infra/key-vault-telemetry.json
+/infra/main.json
+/playbooks/sentinel-incident-response-playbook.json
+/watchlists/critical-assets-watchlist.json
+/workbooks/security-operations-dashboard.json

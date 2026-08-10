@@ -1,0 +1,4 @@
+AssetName,AssetType,ResourceGroup,Criticality,Purpose
+law-nrg-sentinel-dev-eus-001,LogAnalyticsWorkspace,rg-nrg-sentinel-dev-eus-001,High,Central security telemetry workspace
+kv-nrg-sent-dev-eus-001,KeyVault,rg-nrg-sentinel-dev-eus-001,High,Sensitive secret storage and audit telemetry
+rg-nrg-sentinel-dev-eus-001,ResourceGroup,rg-nrg-sentinel-dev-eus-001,High,Project security resource boundary

@@ -1,0 +1,21 @@
+AzureActivity
+| where CategoryValue == 'Administrative'
+| where OperationNameValue in~ (
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE',
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE'
+)
+| where ActivityStatusValue =~ 'Success'
+| extend RBACAction = case(
+    OperationNameValue endswith '/WRITE', 'Role Assignment Created or Updated',
+    OperationNameValue endswith '/DELETE', 'Role Assignment Deleted',
+    'Unknown'
+)
+| project
+    TimeGenerated,
+    RBACAction,
+    OperationNameValue,
+    ActivityStatusValue,
+    Caller,
+    ResourceGroup,
+    ResourceId
+| order by TimeGenerated desc

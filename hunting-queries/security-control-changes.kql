@@ -1,0 +1,24 @@
+AzureActivity
+| where TimeGenerated > ago(24h)
+| where CategoryValue == 'Administrative'
+| where ActivityStatusValue =~ 'Success'
+| where OperationNameValue in~ (
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE',
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE',
+    'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/WRITE',
+    'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/DELETE'
+)
+| extend ChangeType = case(
+    OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE', 'RBAC Role Assignment Created or Updated',
+    OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE', 'RBAC Role Assignment Deleted',
+    OperationNameValue =~ 'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/WRITE', 'Sentinel Analytics Rule Created or Updated',
+    OperationNameValue =~ 'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/DELETE', 'Sentinel Analytics Rule Deleted',
+    'Other Security Control Change'
+)
+| project
+    TimeGenerated,
+    ChangeType,
+    OperationNameValue,
+    Caller,
+    ResourceGroup
+| order by TimeGenerated desc

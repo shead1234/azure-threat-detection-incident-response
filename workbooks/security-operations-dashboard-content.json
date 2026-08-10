@@ -1,0 +1,117 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# Northstar Security Operations Dashboard\nMicrosoft Sentinel monitoring dashboard for Project 3 - Azure Threat Detection and Automated Incident Response."
+      },
+      "name": "dashboard-title"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Recent Security-Control Changes"
+      },
+      "name": "security-control-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\n| where TimeGenerated > ago(24h)\n| where CategoryValue == 'Administrative'\n| where ActivityStatusValue =~ 'Success'\n| where OperationNameValue in~ ('MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE','MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE','MICROSOFT.SECURITYINSIGHTS/ALERTRULES/WRITE','MICROSOFT.SECURITYINSIGHTS/ALERTRULES/DELETE')\n| extend ChangeType = case(OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE','RBAC Role Assignment Created or Updated',OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE','RBAC Role Assignment Deleted',OperationNameValue =~ 'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/WRITE','Sentinel Analytics Rule Created or Updated',OperationNameValue =~ 'MICROSOFT.SECURITYINSIGHTS/ALERTRULES/DELETE','Sentinel Analytics Rule Deleted','Other')\n| project TimeGenerated, ChangeType, ResourceGroup\n| order by TimeGenerated desc",
+        "size": 0,
+        "title": "Azure Security-Control Changes - Last 24 Hours",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__WORKSPACE_ID__"
+        ]
+      },
+      "name": "security-control-query"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Key Vault Security Activity"
+      },
+      "name": "keyvault-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AZKVAuditLogs\n| where TimeGenerated > ago(24h)\n| where OperationName in~ ('SecretSet','SecretGet')\n| project TimeGenerated, OperationName, ResultType, HttpStatusCode, IsRbacAuthorized\n| order by TimeGenerated desc",
+        "size": 0,
+        "title": "Key Vault Secret Operations - Last 24 Hours",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__WORKSPACE_ID__"
+        ]
+      },
+      "name": "keyvault-query"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Critical Assets"
+      },
+      "name": "critical-assets-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "_GetWatchlist('critical-assets')\n| project AssetName, AssetType, Criticality, Purpose, ResourceGroup\n| order by AssetType asc",
+        "size": 0,
+        "title": "Northstar Critical Assets Watchlist",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__WORKSPACE_ID__"
+        ]
+      },
+      "name": "critical-assets-query"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Security Activity Trend"
+      },
+      "name": "activity-trend-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\n| where TimeGenerated > ago(24h)\n| where CategoryValue == 'Administrative'\n| summarize SecurityChanges=count() by bin(TimeGenerated, 1h)\n| order by TimeGenerated asc",
+        "size": 0,
+        "title": "Administrative Activity Over Time",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "linechart",
+        "crossComponentResources": [
+          "__WORKSPACE_ID__"
+        ]
+      },
+      "name": "activity-trend-query"
+    }
+  ],
+  "isLocked": false,
+  "fallbackResourceIds": [
+    "__WORKSPACE_ID__"
+  ]
+}

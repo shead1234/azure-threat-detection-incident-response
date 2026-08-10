@@ -1,0 +1,22 @@
+AzureActivity
+| where TimeGenerated > ago(24h)
+| where CategoryValue == 'Administrative'
+| where OperationNameValue in~ (
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE',
+    'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/DELETE'
+)
+| where ActivityStatusValue =~ 'Success'
+| extend RBACAction = case(
+    OperationNameValue endswith '/WRITE', 'Role Assignment Created or Updated',
+    OperationNameValue endswith '/DELETE', 'Role Assignment Deleted',
+    'Unknown'
+)
+| summarize
+    ChangeCount = count(),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    Actions = make_set(RBACAction),
+    ResourceGroups = make_set(ResourceGroup)
+    by Caller
+| where ChangeCount >= 2
+| order by ChangeCount desc
